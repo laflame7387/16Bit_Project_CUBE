@@ -186,4 +186,11 @@ class Program
         Console.WriteLine($"\n출현한 적 수: {enemyCount}");
         Console.WriteLine($"플레이어 공격력: {playerAtk}, 현재 체력: {playerHP}");
     }
+
+    static void inventory()
+    {
+        Console.Clear();
+        Console.WriteLine("인벤토리");
+        
+    }
 }

@@ -216,6 +216,7 @@
                 
 
                 int finalDamage = new Random().Next(max, min + 1);
+                int finalDamage = new Random().Next(min, max + 1);
                 int beforeHP = player.CurrentHP;
 
                 player.CurrentHP -= finalDamage;        //      플레이어 현재 체력에 몬스터의 최종 데미지 -

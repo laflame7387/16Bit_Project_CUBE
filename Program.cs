@@ -14,9 +14,57 @@ class Program
     static int playerHP = 100;
     static int playerAtk = 10;
 
+    static string select;
+    static int answer;
+    static bool check;
     static void Main()
     {
-        StartDungeon();
+        do
+        {
+            Console.WriteLine("테스트할 영역을 선택해주세요.");
+            Console.WriteLine();
+            Console.WriteLine("1. 던전파트");
+            Console.WriteLine("프로그램 종료 = 0");
+            select = Console.ReadLine();
+            check = int.TryParse(select, out answer);
+
+            if (!check)
+            {
+                Console.Clear();
+                continue;
+            }
+            else
+            {
+                if (answer == 0)
+                {
+                    break;
+                }
+                else if (answer < 0)
+                {
+                    Console.Clear();
+                    continue;
+                }
+                else
+                {
+                    switch (answer)
+                    {
+                        case 1:
+                            {
+                                StartDungeon();
+                            }
+                            break;
+                        
+                        default :
+                            {
+                                break;
+                            }
+                    }
+                }
+            }
+            
+            Console.Clear();
+        }
+        while (true);// 프로젝트 반복문
     }
 
     static void StartDungeon()

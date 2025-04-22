@@ -191,6 +191,16 @@ class Program
     {
         Console.Clear();
         Console.WriteLine("인벤토리");
-        
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine("[아이템 목록]");
+        Console.WriteLine();
+        Console.WriteLine("무기 1");
+        Console.WriteLine("무기 1");
+        Console.WriteLine("무기 1");
+        Console.WriteLine("방어구 1");
+        Console.WriteLine("방어구 1");
+        Console.WriteLine("방어구 1");
+        Console.WriteLine("포션");
     }
 }

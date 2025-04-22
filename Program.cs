@@ -189,6 +189,7 @@ class Program
 
     static void inventory()
     {
+        
         Console.Clear();
         Console.WriteLine("인벤토리");
         Console.WriteLine();
@@ -202,5 +203,6 @@ class Program
         Console.WriteLine("방어구 1");
         Console.WriteLine("방어구 1");
         Console.WriteLine("포션");
+        
     }
 }

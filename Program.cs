@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 class Player
@@ -76,7 +77,6 @@ class Program
     {
         string input;
 
-       
         while (true)
         {
             Console.Clear();
@@ -261,28 +261,68 @@ class Program
             encountered.Add(new Monster(baseMonster.Name, level, hp, atk));
         }
     }
+        // 전투 반복 루프
+        while (true)
+        {
 
-    // ✅ 몬스터 출력
-    Console.WriteLine("\n[몬스터 정보]");
-    foreach (var m in encountered)
-    {
-        Console.WriteLine(m.ToString());
+            foreach (var m in encountered)      //      몬스터 리스트를 하나씩 확인하며 출력
+            {
+                Console.WriteLine(m.ToString());
+            }
+
+            Console.WriteLine();        //      한줄 띄우기 용 <공백 칸>
+
+            Console.WriteLine("\n1. 공격");
+            Console.WriteLine("\n원하시는 행동을 입력해주세요.");
+            Console.Write(">> ");
+            string input = Console.ReadLine();
+
+            if (input == "1")
+            {
+                BattleSystem.PlayerAttack(player, encountered);
+            }
+            else
+            {
+                Console.WriteLine("잘못된 입력입니다");
+                continue;
+            }
+
+            // 승패 조건 확인 시스템
+            if (player.HP <= 0 || encountered.All(m => m.HP <= 0))
+                break;
+
+            BattleSystem.EnemyPhase(player, encountered);        //      몬스터 턴
+
+            if (player.HP <= 0 || encountered.All(m => m.HP <= 0))
+                break;
+        }
+
+        // ✅ 경험치 지급
+        int totalExp = encountered.Count * 30 + (currentFloor == 16 ? 100 : 0);
+        player.GainExp(totalExp);
+        Console.WriteLine("\n>> Enter를 누르면 계속 진행합니다...");
+        Console.ReadLine();
+
+
+
+
+        Console.WriteLine($"\n출현한 적 수: {enemyCount}");
+        Console.WriteLine($"플레이어 공격력: {playerAtk}, 현재 체력: {playerHP}");
+
+        player.GainExp(enemyCount * 30);
+
+        BattleSystem.ShowBattleResult(player, encountered);
     }
-
-    // ✅ 경험치 지급
-    int totalExp = encountered.Count * 30 + (currentFloor == 16 ? 100 : 0);
-    player.GainExp(totalExp);
-    Console.WriteLine("\n>> Enter를 누르면 계속 진행합니다...");
-    Console.ReadLine();
 }
 
 
-    class Monster
+
+class Monster       //      몬스터 기본 틀
 {
-    public string Name;
-    public int Level;
-    public int HP;
-    public int Attack;
+    public string Name;     //      몬스터 이름
+    public int Level;       //      몬스터 레벨
+    public int HP;          //      몬스터 체력
+    public int Attack;      //      몬스터 공격력
 
     public Monster(string name, int level, int hp, int attack)
     {
@@ -294,8 +334,156 @@ class Program
 
     public override string ToString()
     {
-        return $"Lv.{Level} {Name} | HP: {HP} | ATK: {Attack}";
+        return $"Lv.{Level} {Name} HP {HP}";
     }
 }
 
-}
+
+class BattleSystem      //      전투 시스템 틀
+{
+    // 플레이어 공격 기능 시스템
+    public static void PlayerAttack(Player player, List<Monster> monsters)
+    {
+        Console.Clear();
+        Console.WriteLine($"Battle!!\n");
+
+        for (int i = 0; i < monsters.Count; i++)
+        {
+            Monster m = monsters[i];
+            Console.ForegroundColor = m.HP > 0 ? ConsoleColor.White : ConsoleColor.DarkGray;        //      몬스터 체력 0보다 이하 시 네임택 흰색에서 회색으로
+            Console.WriteLine($"{i + 1} Lv.{m.Level} {m.Name}");
+        }
+
+        Console.ResetColor();
+        Console.WriteLine();
+
+        Console.WriteLine("\n0. 취소");
+        Console.Write("\n대상을 선택해주세요.\n>> ");
+
+        string input = Console.ReadLine();
+        if (!int.TryParse(input, out int choice) || choice < 0 || choice > monsters.Count)     //      "일치하는 몬스터"를 선택하지 "않았을" 시
+        {
+            Console.WriteLine("잘못된 입력입니다.");
+            return;
+        }
+
+        if (choice == 0)
+        {
+            Console.WriteLine("잘못된 입력입니다.");
+            return;
+        }
+
+        Monster target = monsters[choice - 1];      //      플레이어가 선택한 몬스터를 "target" 이름으로 저장, index 번호를 맞추기 위해 -1 입력
+
+        if (target.HP <= 0)     //      이미 죽은 몬스터 선택 시
+        {
+            Console.WriteLine("잘못된 입력입니다.");
+            return;
+        }
+
+        // 공격력 계산 식
+        int baseDamage = player.TotalAtk;     //      플레이어 기본 공격력 <상태창 완성 시 수정>
+        double variance = Math.Ceiling(baseDamage * 0.1);       //      오차가 소수점일 시 올림 처리
+        int min = baseDamage - (int)variance;       //      variance = 편차, 즉 - 1 + 1 variance 를 넣음으로 9~11 사이 랜덤 값이 결정됨
+        int max = baseDamage + (int)variance;       //      variance = 편차, 즉 - 1 + 1 variance 를 넣음으로 9~11 사이 랜덤 값이 결정됨
+
+        int finalDamage = new Random().Next(min, max + 1);      //      최종 데미지는 = 하한값과 상한값 중 랜덤. max + 1은 값 11까지 나타내기 위해
+        int beforeHP = target.HP;
+
+        target.HP -= finalDamage;       //      몬스터 체력에 최종 데미지 -
+        if (target.HP <= 0) target.HP = 0;      //      만약 몬스터 체력 0보다 작거나 같다 = 몬스터 체력 0
+
+        //  계산 결과 출력
+        Console.WriteLine("\n0. 다음\n");
+        Console.WriteLine($"Chad 의 공격!");
+        Console.WriteLine($"{target.Name} 을 맞췄습니다. [데미지 : {finalDamage}]");                         //  어우 겹겹이 쌓인게 거북칩도 아니고;
+        Console.WriteLine($"\n{target.Name}\nHP {beforeHP} -> {(target.HP <= 0 ? "Dead" : target.HP.ToString())}");     //      몬스터의 맞기 전 체력 -> 맞은 후 [체력이 0 일 때: 참-Dead 출력 : 거짓-몬스터 체력 출력] <삼항 연산자>
+
+        Console.Write(">> ");
+        Console.ReadLine();
+
+    }
+
+    // 적 차례 공격 시스템
+    public static void EnemyPhase(Player player, List<Monster> monsters)
+    {
+        Console.Clear();
+        Console.WriteLine("Enemy Phase\n");
+
+        foreach (Monster m in monsters)
+        {
+            if (m.HP <= 0)
+            {
+                continue;       //      Dead 상태일 시 공격 하지 않는다
+            }
+
+            Console.WriteLine("Battle!!\n");
+
+            Console.WriteLine($"Lv.{m.Level} {m.Name} 의 공격!");      //      m = monster
+
+            // 몬스터 데미지 계산 식 +-10% 오차
+            int baseDamage = m.Attack;
+            double variance = Math.Ceiling(baseDamage * 0.1);       //      오차가 소수점일 시 올림 처리 
+            int min = baseDamage - (int)variance;
+            int max = baseDamage + (int)variance;
+
+            int finalDamage = new Random().Next(min, max + 1);
+            int beforeHP = player.HP;
+
+            player.HP -= finalDamage;        //      플레이어 현재 체력에 몬스터의 최종 데미지 -
+            if (player.HP <= 0) player.HP = 0;
+
+            Console.WriteLine($"{player.Name}을 맞췄습니다. [데미지 : {finalDamage}]\n");
+
+            Console.WriteLine($"Lv.{player.Level} {player.Name}");
+            Console.WriteLine($"HP {beforeHP} -> {player.HP}\n");        //      플레이어 몬스터에게 피격 전 체력 -> 피격 후 체력
+
+            Console.WriteLine("0. 다음");
+            Console.WriteLine("대상을 선택해주세요.\n>> ");
+            Console.ReadLine();
+            Console.Clear();
+        }
+        
+        if (player.HP <= 0)
+        {
+            ShowBattleResult(player, monsters);
+        }
+
+        Console.WriteLine("EnemyPhase Phase 종료. 플레이어 턴으로 돌아갑니다.");
+        Console.WriteLine("0. 다음");
+        Console.ReadLine();
+    }
+
+    // 전투 결과 출력 시스템
+    public static void ShowBattleResult(Player player, List<Monster> monsters)
+    {
+        Console.Clear();
+        Console.WriteLine("Battle - Result\n");
+
+        if (player.HP <= 0)      //      만약 플레이어 체력이 0보다 작거나 같으면 밑 콘솔 출력
+        {
+            Console.WriteLine("You Lose\n");
+            Console.WriteLine($"Lv.{player.Level} {player.Name}");
+
+            Environment.Exit(0);
+            Console.ReadLine();
+        }
+        else       //       아닐 시 밑 기능 실행 
+        {
+            Console.WriteLine("Victory\n");
+
+            int defeated = 0;       //      기본 값 0
+            foreach (var m in monsters)
+            {
+                if (m.HP <= 0) defeated++;      //      몬스터의 체력이 0보다 작거나 같을 시 defeated에 1씩 추가
+            }
+
+            Console.WriteLine($"던전에서 몬스터 {defeated}마리를 잡았습니다.\n");
+            Console.WriteLine($"Lv.{player.Level} {player.Name}");
+        }
+        Console.WriteLine("0 다음");
+        Console.WriteLine(">> ");
+        Console.ReadLine();
+    }
+};
+

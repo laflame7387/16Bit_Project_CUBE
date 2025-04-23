@@ -196,14 +196,6 @@ class Program
         Random rand = new Random();
         int enemyCount = rand.Next(1, 5);
 
-        List<Monster> encountered = new List<Monster>();     //      컨택 시 List내 Monster 중 호출 <중복 가능성 있음>
-        List<Monster> monsterPool = new List<Monster>        //      몬스터 종류, 스탯 값
-        {
-            new Monster("미니언", 2, 15, 5),       //      이름, 레벨, 체력, 공격력
-            new Monster("대포미니언", 5, 25, 10),
-            new Monster("공허충", 3, 10, 13)
-        };
-
         HashSet<string> used = new HashSet<string>();
         used.Add($"{playerX},{playerY}");
 
@@ -235,6 +227,15 @@ class Program
             }
             Console.WriteLine(line);
         }
+
+        List<Monster> encountered = new List<Monster>();     //      컨택 시 List내 Monster 중 호출 <중복 가능성 있음>
+        List<Monster> monsterPool = new List<Monster>        //      몬스터 종류, 스탯 값
+        {
+            new Monster("미니언", 2, 15, 5),       //      이름, 레벨, 체력, 공격력
+            new Monster("대포미니언", 5, 25, 10),
+            new Monster("공허충", 3, 10, 13)
+        };
+
 
         for (int i = 0; i < enemyCount; i++)      //      for 문으로 몬스터 생성
         {

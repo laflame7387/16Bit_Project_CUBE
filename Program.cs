@@ -240,7 +240,7 @@ class Program
                 default:
                     Console.Clear();
                     Console.WriteLine("잘못된 입력입니다");
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1200);
                     continue;
             }
 

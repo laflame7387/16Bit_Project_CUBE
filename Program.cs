@@ -91,7 +91,9 @@ class Program
             Console.WriteLine("2. 전투시작");
             Console.WriteLine();
             Console.WriteLine("원하시는 행동을 입력해주세요.");
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write(">> ");
+            Console.ResetColor();
 
             input = Console.ReadLine();
             Console.Clear();

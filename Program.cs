@@ -80,7 +80,7 @@ class Program
         while (true)
         {
             Console.Clear();
-            Console.WriteLine("스파르타 던전에 오신 여러분 환영합니다.");
+            Console.WriteLine("큐브의 미궁에 사로잡힌 당신은 탈출구를 찾고자 나아기 시작합니다.");
             Console.WriteLine("이제 전투를 시작할 수 있습니다.");
             Console.WriteLine();
             Console.WriteLine("1. 상태보기");
@@ -125,7 +125,7 @@ class Program
             }
             else if (currentFloor == 16)
             {
-                Console.WriteLine("🏆 최종 보스층에 도달했습니다!");
+                Console.WriteLine("🏆 큐브의 끝자락, 16층에 도달했습니다!");
                 StartBattle(); // 여기에 보스 출력 로직을 넣어도 좋음
                 Console.WriteLine("🎉 게임 클리어! 수고하셨습니다!");
                 break;
@@ -142,7 +142,7 @@ class Program
 
     static void ShowRestStage()
     {
-        Console.WriteLine("🛏 휴식 스테이지입니다. 체력 회복 및 레벨업이 가능합니다.\n");
+        Console.WriteLine("🛏 미궁에서 안전한 장소를 찾았습니다. 체력 회복 및 레벨업이 가능합니다.\n");
         Console.WriteLine("1. 체력 완전 회복");
         Console.WriteLine("2. 레벨업 (+공격력 증가)");
         Console.WriteLine("3. 그냥 다음 층으로");
@@ -176,58 +176,100 @@ class Program
     }
 
     static void StartBattle()
+{
+    Console.Clear();
+    Console.WriteLine($"⚔ {currentFloor}층 전투에 돌입합니다!\n");
+
+    char[,] room = new char[height, width];
+
+    // 전체 방을 공백으로 초기화
+    for (int y = 0; y < height; y++)
+        for (int x = 0; x < width; x++)
+            room[y, x] = ' ';
+
+    // 플레이어 위치
+    int playerX = 3;
+    int playerY = 2;
+    room[playerY, playerX] = playerSymbol;
+
+    // 적 배치
+    Random rand = new Random();
+    int enemyCount = currentFloor == 16 ? 1 : rand.Next(1, 5);  // 보스전은 1명 고정
+    HashSet<string> used = new HashSet<string> { $"{playerX},{playerY}" };
+
+    for (int i = 0; i < enemyCount; i++)
     {
-        Console.Clear();
-        Console.WriteLine($"⚔ {currentFloor}층 전투에 돌입합니다!\n");
+        int ex, ey;
+        do
+        {
+            ex = rand.Next(1, width - 1);
+            ey = rand.Next(1, height - 1);
+        } while (used.Contains($"{ex},{ey}"));
 
-        char[,] room = new char[height, width];
+        room[ey, ex] = enemySymbol;
+        used.Add($"{ex},{ey}");
+    }
 
-        // 전체를 공백으로 초기화
-        for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++)
-                room[y, x] = ' ';
+    // 출력
+    for (int y = 0; y < height; y++)
+    {
+        string line = "";
+        for (int x = 0; x < width; x++)
+        {
+            if (x == 0 || x == width - 1)
+                line += "|";
+            else if (y == 0 || y == height - 1)
+                line += "-";
+            else
+                line += room[y, x];
+        }
+        Console.WriteLine(line);
+    }
 
-        // 플레이어 위치 고정
-        int playerX = 3;
-        int playerY = 2;
-        room[playerY, playerX] = playerSymbol;
+    Console.WriteLine($"\n출현한 적 수: {enemyCount}");
+    Console.WriteLine($"플레이어 공격력: {player.Atk}, 현재 체력: {player.HP}");
 
-        // 적 개수 랜덤 (1~4명)
-        Random rand = new Random();
-        int enemyCount = rand.Next(1, 5);
+    // ✅ 몬스터 생성
+    List<Monster> encountered = new List<Monster>();
 
-        HashSet<string> used = new HashSet<string>();
-        used.Add($"{playerX},{playerY}");
+    if (currentFloor == 16)
+    {
+        encountered.Add(new Monster("큐브의 심판자", 50, 300, 25));
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("\n⚠ 최종 보스 '큐브의 심판자'가 등장했습니다! ⚠\n");
+        Console.ResetColor();
+    }
+    else
+    {
+        List<Monster> pool = new List<Monster>
+        {
+            new Monster("큐브 데몬", 1, 10, 5),
+            new Monster("미궁의 기사", 1, 15, 10),
+            new Monster("예언자", 1, 5, 13)
+        };
 
         for (int i = 0; i < enemyCount; i++)
         {
-            int ex, ey;
-            do
-            {
-                ex = rand.Next(1, width - 1);
-                ey = rand.Next(1, height - 1);
-            } while (used.Contains($"{ex},{ey}"));
+            int index = rand.Next(pool.Count);
+            Monster baseMonster = pool[index];
 
-            room[ey, ex] = enemySymbol;
-            used.Add($"{ex},{ey}");
+            // 층수 기반 능력치 강화
+            int level = baseMonster.Level + (currentFloor / 2);
+            int hp = baseMonster.HP + (currentFloor * 3);
+            int atk = baseMonster.Attack + (currentFloor / 2);
+
+            encountered.Add(new Monster(baseMonster.Name, level, hp, atk));
         }
+    }
 
-        // 테두리 포함하여 출력
-        for (int y = 0; y < height; y++)
-        {
-            string line = "";
-            for (int x = 0; x < width; x++)
-            {
-                if (x == 0 || x == width - 1)
-                    line += "|";
-                else if (y == 0 || y == height - 1)
-                    line += "-";
-                else
-                    line += room[y, x];
-            }
-            Console.WriteLine(line);
-        }
+    // ✅ 몬스터 출력
+    Console.WriteLine("\n[몬스터 정보]");
+    foreach (var m in encountered)
+    {
+        Console.WriteLine(m.ToString());
+    }
 
+<<<<<<< HEAD
         List<Monster> encountered = new List<Monster>();     //      컨택 시 List내 Monster 중 호출 <중복 가능성 있음>
         List<Monster> monsterPool = new List<Monster>        //      몬스터 종류, 스탯 값
         {
@@ -465,3 +507,35 @@ class BattleSystem      //      전투 시스템 틀
         Console.ReadLine();
     }
 };
+=======
+    // ✅ 경험치 지급
+    int totalExp = encountered.Count * 30 + (currentFloor == 16 ? 100 : 0);
+    player.GainExp(totalExp);
+    Console.WriteLine("\n>> Enter를 누르면 계속 진행합니다...");
+    Console.ReadLine();
+}
+
+
+    class Monster
+{
+    public string Name;
+    public int Level;
+    public int HP;
+    public int Attack;
+
+    public Monster(string name, int level, int hp, int attack)
+    {
+        Name = name;
+        Level = level;
+        HP = hp;
+        Attack = attack;
+    }
+
+    public override string ToString()
+    {
+        return $"Lv.{Level} {Name} | HP: {HP} | ATK: {Attack}";
+    }
+}
+
+}
+>>>>>>> Develop

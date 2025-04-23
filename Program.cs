@@ -311,7 +311,7 @@ class Program
 
         player.GainExp(enemyCount * 30);
 
-        BattleSystem.ShowBattleResult(player, encountered, playerHP);
+        BattleSystem.ShowBattleResult(player, encountered);
     }
 }
 
@@ -443,6 +443,11 @@ class BattleSystem      //      전투 시스템 틀
             Console.ReadLine();
             Console.Clear();
         }
+        
+        if (player.HP <= 0)
+        {
+            ShowBattleResult(player, monsters);
+        }
 
         Console.WriteLine("EnemyPhase Phase 종료. 플레이어 턴으로 돌아갑니다.");
         Console.WriteLine("0. 다음");
@@ -450,7 +455,7 @@ class BattleSystem      //      전투 시스템 틀
     }
 
     // 전투 결과 출력 시스템
-    public static void ShowBattleResult(Player player, List<Monster> monsters, int beforeHP)
+    public static void ShowBattleResult(Player player, List<Monster> monsters)
     {
         Console.Clear();
         Console.WriteLine("Battle - Result\n");
@@ -459,7 +464,7 @@ class BattleSystem      //      전투 시스템 틀
         {
             Console.WriteLine("You Lose\n");
             Console.WriteLine($"Lv.{player.Level} {player.Name}");
-            Console.WriteLine($"HP {beforeHP} -> 0\n");
+
             Environment.Exit(0);
             Console.ReadLine();
         }
@@ -475,7 +480,6 @@ class BattleSystem      //      전투 시스템 틀
 
             Console.WriteLine($"던전에서 몬스터 {defeated}마리를 잡았습니다.\n");
             Console.WriteLine($"Lv.{player.Level} {player.Name}");
-            Console.WriteLine($"HP {beforeHP} -> {player.HP}\n");
         }
         Console.WriteLine("0 다음");
         Console.WriteLine(">> ");

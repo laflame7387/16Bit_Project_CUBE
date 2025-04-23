@@ -99,6 +99,7 @@ class Program
             {
                 case "1":
                     Console.WriteLine("1. 상태보기");
+                    player.DisplayStat();
                     break;
                 case "2":
                     Console.WriteLine("2. 전투시작");

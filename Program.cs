@@ -158,10 +158,10 @@ class Program
 
     static void ShowRestStage()
     {
-        Console.WriteLine("🛏 휴식 스테이지입니다. 체력 회복 및 레벨업이 가능합니다.\n");
+        Console.WriteLine("🛏 큐브에서 안전한 장소를 찾았습니다... 체력 회복 및 레벨업이 가능합니다.\n");
         Console.WriteLine("1. 체력 완전 회복");
         Console.WriteLine("2. 레벨업 (+공격력 증가)");
-        Console.WriteLine("3. 그냥 다음 층으로");
+        Console.WriteLine("3. 스킵");
 
         Console.Write("\n>> 선택: ");
         string? input = Console.ReadLine();
@@ -194,7 +194,7 @@ class Program
     static void StartBattle()
     {
         Console.Clear();
-        Console.WriteLine($"⚔ {currentFloor}층 전투에 돌입합니다!\n");
+        Console.WriteLine($"큐브 ⚔ {currentFloor}층... 전투에 돌입합니다!\n");
 
         char[,] room = new char[height, width];
 

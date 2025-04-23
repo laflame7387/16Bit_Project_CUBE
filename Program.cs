@@ -74,61 +74,44 @@ class Program
     static Player player = new Player();
     static void Main()
     {
-        do
+        string input;
+
+       
+        while (true)
         {
-            Console.WriteLine("테스트할 영역을 선택해주세요.");
-            Console.WriteLine();
-            Console.WriteLine("1. 던전파트");
-            Console.WriteLine("2. 상태창");
-            Console.WriteLine("프로그램 종료 = 0");
-            select = Console.ReadLine();
-            check = int.TryParse(select, out answer);
-
-            if (!check)
-            {
-                Console.Clear();
-                continue;
-            }
-            else
-            {
-                if (answer == 0)
-                {
-                    break;
-                }
-                else if (answer < 0)
-                {
-                    Console.Clear();
-                    continue;
-                }
-                else
-                {
-                    switch (answer)
-                    {
-                        case 1:
-                            {
-                                StartDungeon();
-                            }
-                            break;
-                        case 2:
-                            {
-                                player.DisplayStat();
-                            }
-                            break;
-
-                        default :
-                            {
-                                break;
-                            }
-                    }
-                }
-            }
-            
             Console.Clear();
+            Console.WriteLine("스파르타 던전에 오신 여러분 환영합니다.");
+            Console.WriteLine("이제 전투를 시작할 수 있습니다.");
+            Console.WriteLine();
+            Console.WriteLine("1. 상태보기");
+            Console.WriteLine("2. 전투시작");
+            Console.WriteLine();
+            Console.WriteLine("원하시는 행동을 입력해주세요.");
+            Console.Write(">> ");
+
+            input = Console.ReadLine();
+            Console.Clear();
+
+            if (input == "0")
+                break;
+
+            switch (input)
+            {
+                case "1":
+                    Console.WriteLine("1. 상태보기");
+                    break;
+                case "2":
+                    Console.WriteLine("2. 전투시작");
+                    StartDungeon();
+                    break;
+                default:
+                    Console.WriteLine("잘못된 입력입니다.");
+                    break;
+            }
         }
-        while (true);// 프로젝트 반복문
     }
 
-    static void StartDungeon()
+        static void StartDungeon()
     {
         while (currentFloor <= 16)
         {

@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Threading;
+using System.Threading.Tasks.Dataflow;
 
 class Player
 {
-    public string Name = "플레이어";
-    public string Job = "전사";
-    public int Level = 1;
-    public int Exp = 0;
-    public int ExpToLevel = 100;
-    public int MaxExp = 100;
-    public int MaxHP = 100;
-    public int HP = 100;
-    public int Atk = 10;
-    public int Def = 10;
+    public string? Name;
+    public string Job;
+    public int Level;
+    public int Exp;
+    public int ExpToLevel;
+    public int MaxExp;
+    public int MaxHP;
+    public int HP;
+    public int Atk;
+    public float CritChance;
+    public float CritMultiplier;
+    public int Def;
 
     public string Weapon = "없음";
     public int WeaponAtk = 0;
@@ -53,6 +57,87 @@ class Player
             Def += 1;
             HP = MaxHP;
             Console.WriteLine($"레벨업! 현재 레벨: {Level}");
+        }
+    }
+    // 캐릭터 직업 선택, 생성
+    static Player CreatePlayer()
+    {
+        Console.Clear();
+        Console.WriteLine("당신의 이름은 무엇입니까");
+        string? name = Console.ReadLine();
+
+        Console.WriteLine("\n당신의 직업은 무엇입니까");
+        Console.WriteLine("1. 전사");
+        Console.WriteLine("2. 도적");
+        Console.WriteLine("3. 기사");
+
+        string jobinput = Console.ReadLine();
+        string job = "";
+        int level = 0;
+        int exp = 0;
+        int expToLevel = 0;
+        int maxExp = 0;
+        int maxHP = 0;
+        int hp = 0;
+        int atk = 0;
+        float critchance = 0f;
+        float critmultiplier = 0f;
+        int def = 0;
+
+        switch (jobinput)
+        {
+            case "1":
+                job = "전사";
+                level = 1;
+                exp = 0;
+                expToLevel = 100;
+                maxExp = 100;
+                maxHP = 100;
+                hp = 100;
+                atk = 10;
+                critchance = 0.15f;
+                critmultiplier = 1.6f;
+                def = 10;
+                break;
+            case "2":
+                job = "도적";
+                level = 1;
+                exp = 0;
+                expToLevel = 100;
+                maxExp = 100;
+                maxHP = 90;
+                hp = 90;
+                atk = 13;
+                critchance = 0.23f;
+                critmultiplier = 1.8f;
+                def = 8;
+                break;
+            case "3":
+                job = "기사";
+                level = 1;
+                exp = 0;
+                expToLevel = 100;
+                maxExp = 100;
+                maxHP = 130;
+                hp = 130;
+                atk = 9;
+                critchance = 0.1f;
+                critmultiplier = 1.3f;
+                def = 13;
+                break;
+            default:
+                job = "형태 없는 자";
+                level = 9999;
+                exp = 0;
+                expToLevel = 9999;
+                maxExp = 9999;
+                maxHP = 99999;
+                hp = 99999;
+                atk = 9999;
+                critchance = 90f;
+                critmultiplier = 2f;
+                def = 9999;
+                break;
         }
     }
 }
@@ -388,13 +473,22 @@ class BattleSystem      //      전투 시스템 틀
         int max = baseDamage + (int)variance;       //      variance = 편차, 즉 - 1 + 1 variance 를 넣음으로 9~11 사이 랜덤 값이 결정됨
 
         int finalDamage = new Random().Next(min, max + 1);      //      최종 데미지는 = 하한값과 상한값 중 랜덤. max + 1은 값 11까지 나타내기 위해
+
+        // 치명타 확률 식
+        bool isCritical = new Random().Next(100) < 15;
+        if (isCritical)
+        {
+            finalDamage = (int)Math.Round(finalDamage * 1.6);       //      크리티컬 시 데미지 160%
+            Console.WriteLine("치명타 공격!!");
+        }
+        //
+
         int beforeHP = target.HP;
 
         target.HP -= finalDamage;       //      몬스터 체력에 최종 데미지 -
         if (target.HP <= 0) target.HP = 0;      //      만약 몬스터 체력 0보다 작거나 같다 = 몬스터 체력 0
 
         //  계산 결과 출력
-        Console.WriteLine("\n0. 다음\n");
         Console.WriteLine($"Chad 의 공격!");
         Console.WriteLine($"{target.Name} 을 맞췄습니다. [데미지 : {finalDamage}]");                         //  어우 겹겹이 쌓인게 거북칩도 아니고;
         Console.WriteLine($"\n{target.Name}\nHP {beforeHP} -> {(target.HP <= 0 ? "Dead" : target.HP.ToString())}");     //      몬스터의 맞기 전 체력 -> 맞은 후 [체력이 0 일 때: 참-Dead 출력 : 거짓-몬스터 체력 출력] <삼항 연산자>
@@ -438,8 +532,6 @@ class BattleSystem      //      전투 시스템 틀
             Console.WriteLine($"Lv.{player.Level} {player.Name}");
             Console.WriteLine($"HP {beforeHP} -> {player.HP}\n");        //      플레이어 몬스터에게 피격 전 체력 -> 피격 후 체력
 
-            Console.WriteLine("0. 다음");
-            Console.WriteLine("대상을 선택해주세요.\n>> ");
             Console.ReadLine();
             Console.Clear();
         }

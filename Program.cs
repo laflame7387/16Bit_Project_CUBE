@@ -26,7 +26,7 @@ class Program
         {
             Console.WriteLine("테스트할 영역을 선택해주세요.");
             Console.WriteLine();
-            Console.WriteLine("1. 던전파트");
+            Console.WriteLine("1. 16층 큐브의 던전으로 입장한다...");
             Console.WriteLine("프로그램 종료 = 0");
             select = Console.ReadLine();
             check = int.TryParse(select, out answer);
@@ -72,7 +72,7 @@ class Program
 
     static void StartDungeon()
     {
-        Player player = new Player("Chad", "전사", 1, 100, 10);       //      이름, 직업, 레벨, 체력, 공격력
+        Player player = new Player("여행자", "전사", 1, 100, 10);       //      이름, 직업, 레벨, 체력, 공격력
 
         while (currentFloor <= 16)
         {
@@ -191,29 +191,41 @@ class Program
         Console.WriteLine($"\n출현한 적 수: {enemyCount}");
         Console.WriteLine($"플레이어 공격력: {playerAtk}, 현재 체력: {playerHP}");
 
-        List<Monster> monsterPool = new List<Monster>        //      몬스터 종류, 스탯 값
-        {
-            new Monster("미니언", 2, 15, 5),       //      이름, 레벨, 체력, 공격력
-            new Monster("대포미니언", 5, 25, 10),
-            new Monster("공허충", 3, 10, 13)
-        };
+        int beforeHP = player.CurrentHP;
+List<Monster> encountered = new List<Monster>();
 
+if (currentFloor == 16)
+{
+    // 16층 전용 보스 몬스터 등장
+    encountered.Add(new Monster("큐브의 심판자", 50, 300, 25));
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("\n⚠ 최종 보스 '큐브의 심판자'가 등장했습니다! ⚠\n");
+    Console.ResetColor();
+}
+else
+{
+    List<Monster> monsterPool = new List<Monster>
+    {
+        new Monster("큐브 데몬", 1, 10, 5),
+        new Monster("미궁의 기사", 1, 20, 10),
+        new Monster("예언자", 1, 5, 13)
+    };
 
-        int beforeHP = player.CurrentHP;        //      전투 시작 전 현재 체력값 저장
+    for (int i = 0; i < enemyCount; i++)
+    {
+        int index = rand.Next(monsterPool.Count);
+        Monster template = monsterPool[index];
 
-        List<Monster> encountered = new List<Monster>();        //      컨택 시 List내 Monster 중 호출 <중복 가능성 있음>
+        // 층수 기반 능력치 보정
+        int level = template.Level + (currentFloor / 2);
+        int hp = template.HP + (currentFloor * 3);
+        int atk = template.Attack + (currentFloor / 2);
 
-        for (int i = 0; i < enemyCount; i++)      //      for 문으로 몬스터 생성
-        {
-            int index = rand.Next(monsterPool.Count);
-            Monster m = new Monster(
-                monsterPool[index].Name,
-                monsterPool[index].Level,
-                monsterPool[index].HP,
-                monsterPool[index].Attack
-                );
-            encountered.Add(m);       //      컨택 시 "m" = monster 추가 <소환>
-        }
+        Monster scaled = new Monster(template.Name, level, hp, atk);
+        encountered.Add(scaled);
+    }
+}
+
 
         // 전투 반복 루프
         while (true)
@@ -377,7 +389,7 @@ class Program
             if (target.HP <= 0) target.HP = 0;      //      만약 몬스터 체력 0보다 작거나 같다 = 몬스터 체력 0
 
             //  계산 결과 출력
-            Console.WriteLine($"Chad 의 공격!");
+            Console.WriteLine($"여행자 의 공격!");
             Console.WriteLine($"{target.Name} 을 맞췄습니다. [데미지 : {finalDamage}]");                         //  어우 겹겹이 쌓인게 거북칩도 아니고;
             Console.WriteLine($"\n{target.Name}\nHP {beforeHP} -> {(target.HP <= 0 ? "Dead" : target.HP.ToString())}");     //      몬스터의 맞기 전 체력 -> 맞은 후 [체력이 0 일 때: 참-Dead 출력 : 거짓-몬스터 체력 출력] <삼항 연산자>
 

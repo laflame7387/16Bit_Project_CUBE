@@ -261,38 +261,6 @@ class Program
             encountered.Add(new Monster(baseMonster.Name, level, hp, atk));
         }
     }
-
-    // ✅ 몬스터 출력
-    Console.WriteLine("\n[몬스터 정보]");
-    foreach (var m in encountered)
-    {
-        Console.WriteLine(m.ToString());
-    }
-
-<<<<<<< HEAD
-        List<Monster> encountered = new List<Monster>();     //      컨택 시 List내 Monster 중 호출 <중복 가능성 있음>
-        List<Monster> monsterPool = new List<Monster>        //      몬스터 종류, 스탯 값
-        {
-            new Monster("미니언", 2, 15, 5),       //      이름, 레벨, 체력, 공격력
-            new Monster("대포미니언", 5, 25, 10),
-            new Monster("공허충", 3, 10, 13)
-        };
-
-
-        for (int i = 0; i < enemyCount; i++)      //      for 문으로 몬스터 생성
-        {
-            int index = rand.Next(monsterPool.Count);
-            Monster m = new Monster(
-                monsterPool[index].Name,
-                monsterPool[index].Level,
-                monsterPool[index].HP,
-                monsterPool[index].Attack
-                );
-            encountered.Add(m);       //      컨택 시 "m" = monster 추가 <소환>
-
-            int beforeHP = player.HP;        //      전투 시작 전 현재 체력값 저장
-        }
-
         // 전투 반복 루프
         while (true)
         {
@@ -303,7 +271,6 @@ class Program
             }
 
             Console.WriteLine();        //      한줄 띄우기 용 <공백 칸>
-            player.DisplayStat();          //      플레이어 스탯 띄우는 칸 <체력 직업 등>
 
             Console.WriteLine("\n1. 공격");
             Console.WriteLine("\n원하시는 행동을 입력해주세요.");
@@ -329,6 +296,13 @@ class Program
             if (player.HP <= 0 || encountered.All(m => m.HP <= 0))
                 break;
         }
+
+        // ✅ 경험치 지급
+        int totalExp = encountered.Count * 30 + (currentFloor == 16 ? 100 : 0);
+        player.GainExp(totalExp);
+        Console.WriteLine("\n>> Enter를 누르면 계속 진행합니다...");
+        Console.ReadLine();
+
 
 
 
@@ -382,7 +356,6 @@ class BattleSystem      //      전투 시스템 틀
 
         Console.ResetColor();
         Console.WriteLine();
-        player.DisplayStat();
 
         Console.WriteLine("\n0. 취소");
         Console.Write("\n대상을 선택해주세요.\n>> ");
@@ -487,6 +460,8 @@ class BattleSystem      //      전투 시스템 틀
             Console.WriteLine("You Lose\n");
             Console.WriteLine($"Lv.{player.Level} {player.Name}");
             Console.WriteLine($"HP {beforeHP} -> 0\n");
+            Environment.Exit(0);
+            Console.ReadLine();
         }
         else       //       아닐 시 밑 기능 실행 
         {
@@ -507,35 +482,4 @@ class BattleSystem      //      전투 시스템 틀
         Console.ReadLine();
     }
 };
-=======
-    // ✅ 경험치 지급
-    int totalExp = encountered.Count * 30 + (currentFloor == 16 ? 100 : 0);
-    player.GainExp(totalExp);
-    Console.WriteLine("\n>> Enter를 누르면 계속 진행합니다...");
-    Console.ReadLine();
-}
 
-
-    class Monster
-{
-    public string Name;
-    public int Level;
-    public int HP;
-    public int Attack;
-
-    public Monster(string name, int level, int hp, int attack)
-    {
-        Name = name;
-        Level = level;
-        HP = hp;
-        Attack = attack;
-    }
-
-    public override string ToString()
-    {
-        return $"Lv.{Level} {Name} | HP: {HP} | ATK: {Attack}";
-    }
-}
-
-}
->>>>>>> Develop

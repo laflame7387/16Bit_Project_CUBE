@@ -2,6 +2,59 @@
 using System.Collections.Generic;
 using System.Threading;
 
+class Player
+{
+    public string Name = "플레이어";
+    public string Job = "전사";
+    public int Level = 1;
+    public int Exp = 0;
+    public int ExpToLevel = 100;
+    public int MaxExp = 100;
+    public int MaxHP = 100;
+    public int HP = 100;
+    public int Atk = 10;
+    public int Def = 10;
+
+    public string Weapon = "없음";
+    public int WeaponAtk = 0;
+    public string Armor = "없음";
+    public int ArmorDef = 0;
+
+    public int TotalAtk => Atk + WeaponAtk;
+    public int TotalDef => Def + ArmorDef;
+
+    public void DisplayStat()
+    {
+        Console.Clear();
+        Console.WriteLine($"상태창");
+        Console.WriteLine($"이름: {Name} ({Job})");
+        Console.WriteLine($"레벨: {Level}");
+        Console.WriteLine($"체력: {HP}");
+        Console.WriteLine($"공격력: {Atk} ({WeaponAtk}) = {TotalAtk}");
+        Console.WriteLine($"방어력: {Def} ({ArmorDef}) = {TotalDef}");
+        Console.WriteLine("무기: {Weapon}, 방어구: {Armor}");
+        Console.WriteLine($"경험치: {Exp}/{ExpToLevel}");
+        Console.WriteLine("\n 0을 눌러 메뉴로 돌아가기");
+        Console.ReadLine();
+    }
+    public void GainExp(int amount)
+    {
+        Exp += amount;
+        Console.WriteLine($"경험치 {amount} 획득!");
+
+        while (Exp >= ExpToLevel)
+        {
+            Exp -= ExpToLevel;
+            Level++;
+            ExpToLevel += 50;
+            MaxHP += 100;
+            Atk += 2;
+            Def += 1;
+            HP = MaxHP;
+            Console.WriteLine($"레벨업! 현재 레벨: {Level}");
+        }
+    }
+}
 class Program
 {
     const int width = 12;
@@ -17,6 +70,8 @@ class Program
     static string select;
     static int answer;
     static bool check;
+
+    static Player player = new Player();
     static void Main()
     {
         do
@@ -24,6 +79,7 @@ class Program
             Console.WriteLine("테스트할 영역을 선택해주세요.");
             Console.WriteLine();
             Console.WriteLine("1. 던전파트");
+            Console.WriteLine("2. 상태창");
             Console.WriteLine("프로그램 종료 = 0");
             select = Console.ReadLine();
             check = int.TryParse(select, out answer);
@@ -53,7 +109,12 @@ class Program
                                 StartDungeon();
                             }
                             break;
-                        
+                        case 2:
+                            {
+                                player.DisplayStat();
+                            }
+                            break;
+
                         default :
                             {
                                 break;
@@ -185,6 +246,8 @@ class Program
 
         Console.WriteLine($"\n출현한 적 수: {enemyCount}");
         Console.WriteLine($"플레이어 공격력: {playerAtk}, 현재 체력: {playerHP}");
+
+        player.GainExp(enemyCount * 30);
     }
 
     static void inventory()

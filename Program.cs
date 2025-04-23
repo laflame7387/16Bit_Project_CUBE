@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 
 class Program
@@ -239,8 +240,8 @@ class Program
                 default:
                     Console.Clear();
                     Console.WriteLine("잘못된 입력입니다");
-                    Thread.Sleep(1500);
-                    return;
+                    Thread.Sleep(1000);
+                    continue;
             }
 
             // 승패 조건 확인 시스템
@@ -329,8 +330,16 @@ class Program
 
             Console.WriteLine("\n0. 취소");
             Console.Write("\n대상을 선택해주세요.\n>> ");
-
             string input = Console.ReadLine();
+            switch (input)
+            {
+                case ("0"):
+                    Console.WriteLine("취소됨");
+                    return;
+                    
+            }
+
+
             if (!int.TryParse(input, out int choice) || choice < 0 || choice > monsters.Count)     //      "일치하는 몬스터"를 선택하지 "않았을" 시
             {
                 Console.WriteLine("잘못된 입력입니다.");
@@ -411,7 +420,6 @@ class Program
                 Console.WriteLine($"Lv.{player.Level} {player.Name}");
                 Console.WriteLine($"HP {beforeHP} -> {player.CurrentHP}\n");        //      플레이어 몬스터에게 피격 전 체력 -> 피격 후 체력
 
-                Console.WriteLine("대상을 선택해주세요.\n>> ");
                 Console.ReadLine();
                 Console.Clear();
             }

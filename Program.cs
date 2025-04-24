@@ -236,7 +236,7 @@ public class Armor : Item //방어구
 }
 public class Supplies : Item //소모품 
 {
-    public Supplies(string itemName, int itemCount) : base(itemName, 0, 0, itemCount, "소모품")
+    public Supplies(string itemName, int itemCount) : base(itemName, 0, 0, itemCount, "소모품") { }
 
     public override void Use()
     {
@@ -254,7 +254,7 @@ public class Supplies : Item //소모품
 }
 public class Others : Item //기타 아이템
 {
-    public Others(string itemName) : base(itemName, 0, 0, 1, "기타")
+    public Others(string itemName) : base(itemName, 0, 0, 1, "기타") { }
 
     public override void Use()
     {

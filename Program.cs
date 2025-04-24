@@ -30,17 +30,31 @@ class Player
 
     public void DisplayStat()
     {
-        Console.Clear();
-        Console.WriteLine($"상태창");
-        Console.WriteLine($"이름: {Name} ({Job})");
-        Console.WriteLine($"레벨: {Level}");
-        Console.WriteLine($"체력: {HP}");
-        Console.WriteLine($"공격력: {Atk} ({WeaponAtk}) = {TotalAtk}");
-        Console.WriteLine($"방어력: {Def} ({ArmorDef}) = {TotalDef}");
-        Console.WriteLine("무기: {Weapon}, 방어구: {Armor}");
-        Console.WriteLine($"경험치: {Exp}/{ExpToLevel}");
-        Console.WriteLine("\n 0을 눌러 메뉴로 돌아가기");
-        Console.ReadLine();
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine($"상태창");
+            Console.WriteLine($"이름: {Name} ({Job})");
+            Console.WriteLine($"레벨: {Level}");
+            Console.WriteLine($"체력: {HP}");
+            Console.WriteLine($"공격력: {Atk} ({WeaponAtk}) = {TotalAtk}");
+            Console.WriteLine($"방어력: {Def} ({ArmorDef}) = {TotalDef}");
+            Console.WriteLine("무기: {Weapon}, 방어구: {Armor}");
+            Console.WriteLine($"경험치: {Exp}/{ExpToLevel}");
+
+            Console.WriteLine("\n\"0\"을 눌러 메뉴로 돌아가기");
+            string input = Console.ReadLine();
+
+            if (input == "0")
+            {
+                break;
+            }
+            else
+            {
+                Console.WriteLine("잘못된 입력입니다");
+                Thread.Sleep(1000);
+            }
+        }
     }
     public void GainExp(int amount)
     {
@@ -59,14 +73,18 @@ class Player
             Console.WriteLine($"레벨업! 현재 레벨: {Level}");
         }
     }
+
     // 캐릭터 직업 선택, 생성
-    static Player CreatePlayer()
+    public static Player CreatePlayer()
     {
         Console.Clear();
+        Console.WriteLine("큐브의 미궁에 사로잡힌 당신은 탈출구를 찾고자 나아기 시작합니다.");
+        Thread.Sleep(1500);
         Console.WriteLine("당신의 이름은 무엇입니까");
         string? name = Console.ReadLine();
 
         Console.WriteLine("\n당신의 직업은 무엇입니까");
+        Thread.Sleep(1000);
         Console.WriteLine("1. 전사");
         Console.WriteLine("2. 도적");
         Console.WriteLine("3. 기사");
@@ -139,6 +157,28 @@ class Player
                 def = 9999;
                 break;
         }
+
+        Player newChar = new Player
+        {
+            Name = name,
+            Job = job,
+            Level = level,
+            Exp = exp,
+            ExpToLevel = expToLevel,
+            MaxExp = maxExp,
+            MaxHP = maxHP,
+            HP = hp,
+            Atk = atk,
+            CritChance = critchance,
+            CritMultiplier = critmultiplier,
+            Def = def,
+        };
+
+        Console.WriteLine($"\n{name} 의 직업은 {job} 입니다.");
+        Console.WriteLine($"HP: {maxHP}, ATK: {atk}, DEF: {def}  LV: {level}");
+        Console.ReadKey();
+
+        return newChar;
     }
 }
 class Program
@@ -162,10 +202,11 @@ class Program
     {
         string input;
 
+        player = Player.CreatePlayer();
+
         while (true)
         {
             Console.Clear();
-            Console.WriteLine("큐브의 미궁에 사로잡힌 당신은 탈출구를 찾고자 나아기 시작합니다.");
             Console.WriteLine("이제 전투를 시작할 수 있습니다.");
             Console.WriteLine();
             Console.WriteLine("1. 상태보기");
@@ -474,11 +515,13 @@ class BattleSystem      //      전투 시스템 틀
 
         int finalDamage = new Random().Next(min, max + 1);      //      최종 데미지는 = 하한값과 상한값 중 랜덤. max + 1은 값 11까지 나타내기 위해
 
-        // 치명타 확률 식
-        bool isCritical = new Random().Next(100) < 15;
+        // 캐릭터 크리티컬 스탯 반영
+        Random rand = new Random();
+        bool isCritical = rand.Next(100) < (int)(player.CritChance * 100);      //      플레이어 크리티컬 찬스 반영
+
         if (isCritical)
         {
-            finalDamage = (int)Math.Round(finalDamage * 1.6);       //      크리티컬 시 데미지 160%
+            finalDamage = (int)Math.Round(finalDamage * player.CritMultiplier);
             Console.WriteLine("치명타 공격!!");
         }
         //
@@ -489,7 +532,7 @@ class BattleSystem      //      전투 시스템 틀
         if (target.HP <= 0) target.HP = 0;      //      만약 몬스터 체력 0보다 작거나 같다 = 몬스터 체력 0
 
         //  계산 결과 출력
-        Console.WriteLine($"Chad 의 공격!");
+        Console.WriteLine($"{player.Name} 의 공격!");
         Console.WriteLine($"{target.Name} 을 맞췄습니다. [데미지 : {finalDamage}]");                         //  어우 겹겹이 쌓인게 거북칩도 아니고;
         Console.WriteLine($"\n{target.Name}\nHP {beforeHP} -> {(target.HP <= 0 ? "Dead" : target.HP.ToString())}");     //      몬스터의 맞기 전 체력 -> 맞은 후 [체력이 0 일 때: 참-Dead 출력 : 거짓-몬스터 체력 출력] <삼항 연산자>
 

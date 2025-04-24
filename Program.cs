@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 
@@ -58,6 +59,31 @@ class Player
         }
     }
 }
+public class Item
+{
+    public string itemName;
+    public int itemAtk;
+    public int itemDef;
+    public string itemType;
+
+    public Item()//아이템 기본 생성자
+    {
+        this.itemName = "아이템";
+        this.itemAtk = 0;
+        this.itemDef = 0;
+        itemType = "None";
+    }
+    public void SetItemInfo (string itemName, int itemAtk, int itemDef, string itemType)
+    {
+        this.itemName = itemName;
+        this.itemAtk = itemAtk;
+        this.itemDef = itemDef;
+        this.itemType = itemType;
+    }
+}
+
+  
+
 class Program
 {
     const int width = 12;
@@ -84,13 +110,11 @@ class Program
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("큐브의 미궁에 사로잡힌 당신은 탈출구를 찾고자 나아가기 시작합니다..."); //마침표 3개로 고쳤어요 !
-            Console.ResetColor();
-            Console.WriteLine("이제 전투를 시작할 수 있습니다.");
-            Console.WriteLine();
+            Console.WriteLine("\n이제 전투를 시작할 수 있습니다.\n");
             Console.WriteLine("1. 상태보기");
             Console.WriteLine("2. 전투시작");
-            Console.WriteLine();
-            Console.WriteLine("원하시는 행동을 입력해주세요.");
+            
+            Console.WriteLine("\n원하시는 행동을 입력해주세요.");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write(">> ");
             Console.ResetColor();
@@ -104,12 +128,12 @@ class Program
             switch (input)
             {
                 case "1":
-                    Console.WriteLine("1. 상태보기");
                     player.DisplayStat();
                     break;
-                case "2":
-                    Console.WriteLine("2. 전투시작");
+                case "2":                   
                     StartDungeon();
+                    break;
+                case "3":
                     break;
                 default:
                     Console.WriteLine("잘못된 입력입니다.");
@@ -117,8 +141,12 @@ class Program
             }
         }
     }
+    // 기본아이템 생성
+    Item sword_0 = new Item();
+    
+    
 
-        static void StartDungeon()
+    static void StartDungeon()
     {
         while (currentFloor <= 16)
         {
@@ -491,5 +519,7 @@ class BattleSystem      //      전투 시스템 틀
         Console.WriteLine(">> ");
         Console.ReadLine();
     }
-};
+
+    
+}
 

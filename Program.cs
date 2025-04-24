@@ -144,6 +144,7 @@ class Program
     }
     // 기본아이템 생성
     Item sword_0 = new Item();
+    sword_0.SetItemInfo("롱소드", 1, 0, "무기");
     
     
 

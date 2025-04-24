@@ -110,6 +110,7 @@ class Program
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("큐브의 미궁에 사로잡힌 당신은 탈출구를 찾고자 나아가기 시작합니다..."); //마침표 3개로 고쳤어요 !
+            Console.ResetColor();
             Console.WriteLine("\n이제 전투를 시작할 수 있습니다.\n");
             Console.WriteLine("1. 상태보기");
             Console.WriteLine("2. 전투시작");

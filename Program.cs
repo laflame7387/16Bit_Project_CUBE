@@ -194,7 +194,7 @@ public class Item
     public int itemDef;
     public string itemType;
 
-    public Item()//아이템 기본 생성자
+    public Item(string itemName, int itemAtk, int itemDef, string itemType)//아이템 기본 생성자
     {
         this.itemName = "아이템";
         this.itemAtk = 0;
@@ -209,8 +209,6 @@ public class Item
         this.itemType = itemType;
     }
 }
-
-  
 
 class Program
 {
@@ -242,7 +240,7 @@ class Program
             Console.WriteLine();
             Console.WriteLine("1. 상태보기");
             Console.WriteLine("2. 전투시작");
-            
+            Console.WriteLine("3. 인벤토리");
             Console.WriteLine("\n원하시는 행동을 입력해주세요.");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write(">> ");
@@ -263,6 +261,7 @@ class Program
                     StartDungeon();
                     break;
                 case "3":
+                    Inventory();
                     break;
                 default:
                     Console.WriteLine("잘못된 입력입니다.");
@@ -270,10 +269,28 @@ class Program
             }
         }
     }
-    // 기본아이템 생성
-    Item sword_0 = new Item();
-    sword_0.SetItemInfo("롱소드", 1, 0, "무기");
     
+    
+    static void Inventory()//인벤토리
+    {
+        string input;
+        do
+        {
+            Console.Clear();
+            Console.WriteLine("[인벤토리]\n");
+            Console.WriteLine("1.");
+            Console.WriteLine("2.");
+            Console.WriteLine("3.");
+            Console.WriteLine("4.");
+            Console.WriteLine("\n0. 나가기");
+            Console.WriteLine("\n원하는 행동을 입력해주세요.");
+            Console.Write(">>");
+            input = Console.ReadLine();
+            break;
+        }
+        while(input != "0");
+        
+    }   
     
 
     static void StartDungeon()

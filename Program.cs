@@ -187,7 +187,7 @@ class Player
         return newChar;
     }
 }
-public class Item
+public class Item//아이템 가상메서드 이용
 {
     public string itemName;
     public int itemAtk;
@@ -196,18 +196,22 @@ public class Item
 
     public Item(string itemName, int itemAtk, int itemDef, string itemType)//아이템 기본 생성자
     {
-        this.itemName = "아이템";
-        this.itemAtk = 0;
-        this.itemDef = 0;
-        this.itemType = "None";
+        this.itemName = itemName;
+        this.itemAtk = itemAtk;
+        this.itemDef = itemDef;
+        this.itemType = itemType;
     }
-    public void SetItemInfo (string itemName, int itemAtk, int itemDef, string itemType)
+    public void SetItemInfo(string itemName, int itemAtk, int itemDef, string itemType)
     {
         this.itemName = itemName;
         this.itemAtk = itemAtk;
         this.itemDef = itemDef;
         this.itemType = itemType;
     }
+    public virtual void Use();
+    {
+        Console.WriteLine($"{itemName}을 사용했습니다.");
+    }   
 }
 
 class Program

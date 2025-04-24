@@ -193,25 +193,73 @@ public class Item//아이템 가상메서드 이용
     public int itemAtk;
     public int itemDef;
     public string itemType;
+    public int itemCount;
 
-    public Item(string itemName, int itemAtk, int itemDef, string itemType)//아이템 기본 생성자
+    public Item(string itemName, int itemAtk, int itemDef, int itemCount, string itemType)//아이템 기본 생성자
     {
         this.itemName = itemName;
         this.itemAtk = itemAtk;
         this.itemDef = itemDef;
         this.itemType = itemType;
+        this.itemCount = itemCount;
     }
-    public void SetItemInfo(string itemName, int itemAtk, int itemDef, string itemType)
+    public void SetItemInfo(string itemName, int itemAtk, int itemDef, int itemCount, string itemType)
     {
         this.itemName = itemName;
         this.itemAtk = itemAtk;
         this.itemDef = itemDef;
         this.itemType = itemType;
+        this.itemCount = itemCount;
     }
-    public virtual void Use();
+    public virtual void Use()
     {
         Console.WriteLine($"{itemName}을 사용했습니다.");
     }   
+}
+public class Weapon : Item //무기
+{
+    public Weapon(string itemName, int itemAtk) : base(itemName, itemAtk, 0, 0,"무기") { }
+
+    public override void Use()
+    {
+        Console.WriteLine($"{itemName} 무기를 장착했습니다. 공격력이 {itemAtk} 증가합니다.");
+    }
+}
+public class Armor : Item //방어구
+{
+    public Armor(string itemName, int itemDef) : base(itemName, 0, itemDef, 0, "방어구") { }
+
+    public override void Use()
+    {
+        Console.WriteLine($"{itemName} 방어구를 장착했습니다. 방어력이 {itemDef} 증가합니다.");
+    }
+}
+public class Supplies : Item //소모품 
+{
+    public Supplies(string itemName, int itemCount) : base(itemName, 0, 0, itemCount, "소모품")
+
+    public override void Use()
+    {
+        if (itemCount > 0)
+        {
+            itemCount--;
+            Console.WriteLine($"{itemName}을(를) 사용했습니다. (남은 수량: {itemCount})");
+        }
+        else
+        {
+            itemCount = 0;
+            Console.WriteLine($"{itemName}이(가) 더 이상 남아있지 않습니다.");
+        }
+    }
+}
+public class Others : Item //기타 아이템
+{
+    public Others(string itemName) : base(itemName, 0, 0, 1, "기타")
+
+    public override void Use()
+    {
+        Console.WriteLine($"{itemName}을(를) 사용했지만 특별한 효과는 없습니다.");
+    }
 }
 
 class Program

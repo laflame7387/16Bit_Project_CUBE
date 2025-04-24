@@ -2,20 +2,24 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Threading;
+using System.Threading.Tasks.Dataflow;
 
 class Player
 {
-    public string Name = "플레이어";
-    public string Job = "전사";
-    public int Level = 1;
-    public int Exp = 0;
-    public int ExpToLevel = 100;
-    public int MaxExp = 100;
-    public int MaxHP = 100;
-    public int HP = 100;
-    public int Atk = 10;
-    public int Def = 10;
+    public string? Name;
+    public string Job;
+    public int Level;
+    public int Exp;
+    public int ExpToLevel;
+    public int MaxExp;
+    public int MaxHP;
+    public int HP;
+    public int Atk;
+    public float CritChance;
+    public float CritMultiplier;
+    public int Def;
 
     public string Weapon = "없음";
     public int WeaponAtk = 0;
@@ -27,19 +31,33 @@ class Player
 
     public void DisplayStat()
     {
-        Console.Clear();
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"상태창");
-        Console.ResetColor();
-        Console.WriteLine($"이름: {Name} ({Job})");
-        Console.WriteLine($"레벨: {Level}");
-        Console.WriteLine($"체력: {HP}");
-        Console.WriteLine($"공격력: {Atk} ({WeaponAtk}) = {TotalAtk}");
-        Console.WriteLine($"방어력: {Def} ({ArmorDef}) = {TotalDef}");
-        Console.WriteLine("무기: {Weapon}, 방어구: {Armor}");
-        Console.WriteLine($"경험치: {Exp}/{ExpToLevel}");
-        Console.WriteLine("\n 0을 눌러 메뉴로 돌아가기");
-        Console.ReadLine();
+        while (true)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"상태창");
+            Console.ResetColor();
+            Console.WriteLine($"이름: {Name} ({Job})");
+            Console.WriteLine($"레벨: {Level}");
+            Console.WriteLine($"체력: {HP}");
+            Console.WriteLine($"공격력: {Atk} ({WeaponAtk}) = {TotalAtk}");
+            Console.WriteLine($"방어력: {Def} ({ArmorDef}) = {TotalDef}");
+            Console.WriteLine("무기: {Weapon}, 방어구: {Armor}");
+            Console.WriteLine($"경험치: {Exp}/{ExpToLevel}");
+
+            Console.WriteLine("\n\"0\"을 눌러 메뉴로 돌아가기");
+            string input = Console.ReadLine();
+
+            if (input == "0")
+            {
+                break;
+            }
+            else
+            {
+                Console.WriteLine("잘못된 입력입니다");
+                Thread.Sleep(1000);
+            }
+        }
     }
     public void GainExp(int amount)
     {
@@ -57,6 +75,116 @@ class Player
             HP = MaxHP;
             Console.WriteLine($"레벨업! 현재 레벨: {Level}");
         }
+    }
+
+    // 캐릭터 직업 선택, 생성
+    public static Player CreatePlayer()
+    {
+        Console.Clear();
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("큐브의 미궁에 사로잡힌 당신은 탈출구를 찾고자 나아가기 시작합니다..."); //마침표 3개로 고쳤어요 !
+        Console.ResetColor();
+        Thread.Sleep(2000);
+        Console.Clear();
+        Console.WriteLine("당신의 이름은 무엇입니까");
+        string? name = Console.ReadLine();
+
+        Console.WriteLine("\n당신의 직업은 무엇입니까");
+        Thread.Sleep(1000);
+        Console.WriteLine("1. 전사");
+        Console.WriteLine("2. 도적");
+        Console.WriteLine("3. 기사");
+
+        string jobinput = Console.ReadLine();
+        string job = "";
+        int level = 0;
+        int exp = 0;
+        int expToLevel = 0;
+        int maxExp = 0;
+        int maxHP = 0;
+        int hp = 0;
+        int atk = 0;
+        float critchance = 0f;
+        float critmultiplier = 0f;
+        int def = 0;
+
+        switch (jobinput)
+        {
+            case "1":
+                job = "전사";
+                level = 1;
+                exp = 0;
+                expToLevel = 100;
+                maxExp = 100;
+                maxHP = 100;
+                hp = 100;
+                atk = 10;
+                critchance = 0.15f;
+                critmultiplier = 1.6f;
+                def = 10;
+                break;
+            case "2":
+                job = "도적";
+                level = 1;
+                exp = 0;
+                expToLevel = 100;
+                maxExp = 100;
+                maxHP = 90;
+                hp = 90;
+                atk = 13;
+                critchance = 0.23f;
+                critmultiplier = 1.8f;
+                def = 8;
+                break;
+            case "3":
+                job = "기사";
+                level = 1;
+                exp = 0;
+                expToLevel = 100;
+                maxExp = 100;
+                maxHP = 130;
+                hp = 130;
+                atk = 9;
+                critchance = 0.1f;
+                critmultiplier = 1.3f;
+                def = 13;
+                break;
+            default:
+                job = "형태 없는 자";
+                level = 9999;
+                exp = 0;
+                expToLevel = 9999;
+                maxExp = 9999;
+                maxHP = 99999;
+                hp = 99999;
+                atk = 9999;
+                critchance = 90f;
+                critmultiplier = 2f;
+                def = 9999;
+                break;
+        }
+
+        Player newChar = new Player
+        {
+            Name = name,
+            Job = job,
+            Level = level,
+            Exp = exp,
+            ExpToLevel = expToLevel,
+            MaxExp = maxExp,
+            MaxHP = maxHP,
+            HP = hp,
+            Atk = atk,
+            CritChance = critchance,
+            CritMultiplier = critmultiplier,
+            Def = def,
+        };
+
+        Console.WriteLine($"\n{name} 의 직업은 {job} 입니다.");
+        Console.WriteLine($"HP: {maxHP}, ATK: {atk}, DEF: {def}  LV: {level}");
+        Console.ReadKey();
+
+        return newChar;
     }
 }
 public class Item
@@ -105,13 +233,13 @@ class Program
     {
         string input;
 
+        player = Player.CreatePlayer();
+
         while (true)
         {
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("큐브의 미궁에 사로잡힌 당신은 탈출구를 찾고자 나아가기 시작합니다..."); //마침표 3개로 고쳤어요 !
-            Console.ResetColor();
-            Console.WriteLine("\n이제 전투를 시작할 수 있습니다.\n");
+            Console.WriteLine("이제 전투를 시작할 수 있습니다.");
+            Console.WriteLine();
             Console.WriteLine("1. 상태보기");
             Console.WriteLine("2. 전투시작");
             
@@ -424,14 +552,25 @@ class BattleSystem      //      전투 시스템 틀
         int max = baseDamage + (int)variance;       //      variance = 편차, 즉 - 1 + 1 variance 를 넣음으로 9~11 사이 랜덤 값이 결정됨
 
         int finalDamage = new Random().Next(min, max + 1);      //      최종 데미지는 = 하한값과 상한값 중 랜덤. max + 1은 값 11까지 나타내기 위해
+
+        // 캐릭터 크리티컬 스탯 반영
+        Random rand = new Random();
+        bool isCritical = rand.Next(100) < (int)(player.CritChance * 100);      //      플레이어 크리티컬 찬스 반영
+
+        if (isCritical)
+        {
+            finalDamage = (int)Math.Round(finalDamage * player.CritMultiplier);
+            Console.WriteLine("치명타 공격!!");
+        }
+        //
+
         int beforeHP = target.HP;
 
         target.HP -= finalDamage;       //      몬스터 체력에 최종 데미지 -
         if (target.HP <= 0) target.HP = 0;      //      만약 몬스터 체력 0보다 작거나 같다 = 몬스터 체력 0
 
         //  계산 결과 출력
-        Console.WriteLine("\n0. 다음\n");
-        Console.WriteLine($"Chad 의 공격!");
+        Console.WriteLine($"{player.Name} 의 공격!");
         Console.WriteLine($"{target.Name} 을 맞췄습니다. [데미지 : {finalDamage}]");                         //  어우 겹겹이 쌓인게 거북칩도 아니고;
         Console.WriteLine($"\n{target.Name}\nHP {beforeHP} -> {(target.HP <= 0 ? "Dead" : target.HP.ToString())}");     //      몬스터의 맞기 전 체력 -> 맞은 후 [체력이 0 일 때: 참-Dead 출력 : 거짓-몬스터 체력 출력] <삼항 연산자>
 
@@ -474,8 +613,6 @@ class BattleSystem      //      전투 시스템 틀
             Console.WriteLine($"Lv.{player.Level} {player.Name}");
             Console.WriteLine($"HP {beforeHP} -> {player.HP}\n");        //      플레이어 몬스터에게 피격 전 체력 -> 피격 후 체력
 
-            Console.WriteLine("0. 다음");
-            Console.WriteLine("대상을 선택해주세요.\n>> ");
             Console.ReadLine();
             Console.Clear();
         }

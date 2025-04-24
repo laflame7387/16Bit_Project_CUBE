@@ -71,7 +71,7 @@ public class Item
         this.itemName = "아이템";
         this.itemAtk = 0;
         this.itemDef = 0;
-        itemType = "None";
+        this.itemType = "None";
     }
     public void SetItemInfo (string itemName, int itemAtk, int itemDef, string itemType)
     {

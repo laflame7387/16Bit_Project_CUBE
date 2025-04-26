@@ -215,6 +215,10 @@ public class Item//아이템 가상메서드 이용
     {
         Console.WriteLine($"{itemName}을 사용했습니다.");
     }
+    public virtual void UnEquip()
+    {
+        Console.WriteLine("장비를 해제했습니다.");
+    }
 
     public virtual bool IsEquip => false; //장비 장착 확인
 }
@@ -229,8 +233,19 @@ public class Weapon : Item //무기
 
     public override void Use()
     {
-        isEquipped = true;
-        Console.WriteLine($"{itemName} 무기를 장착했습니다. 공격력이 {itemAtk} 증가합니다.");
+        if (!isEquipped)
+        {
+            isEquipped = true;
+            Console.WriteLine($"{itemName} 을(를) 장착했습니다. 공격력이 {itemAtk} 증가합니다.");
+        }    
+    }
+    public override void UnEquip()
+    {
+        if(isEquipped)
+        {
+            isEquipped = false;
+            Console.WriteLine($"{itemName} 을(를) 해제했습니다.");
+        }
     }
 
     public override bool IsEquip => isEquipped;
@@ -246,9 +261,20 @@ public class Armor : Item //방어구
 
     public override void Use()
     {
-        isEquipped = true;
-        Console.WriteLine($"{itemName} 방어구를 장착했습니다. 방어력이 {itemDef} 증가합니다.");
+        if (!isEquipped)
+        {
+            isEquipped = true;
+            Console.WriteLine($"{itemName} 방어구를 장착했습니다. 방어력이 {itemDef} 증가합니다.");
+        }
     }
+    public override void UnEquip()
+    {
+        if (isEquipped)
+        {
+            isEquipped = false;
+            Console.WriteLine($"{itemName} 을(를) 해제했습니다.");
+        }
+
     public override bool IsEquip => isEquipped;
 }
 public class Supplies : Item //소모품 
@@ -353,17 +379,34 @@ class Program
             Console.Clear();
             Console.WriteLine("[인벤토리]\n");
             Console.WriteLine("-[아이템 목록]-\n");
+            
             if(inven.Count == 0)
             {
                 Console.WriteLine("소지중인 아이템이 없습니다.");
             }
+            
             else if (inven.Count > 0)
             {
                 for(int i = 0; i < inven.Count; i++)
                 {
+
+                    Item item = inven[i];
+
+
+                    string equipStatus = item.IsEquip ? "[E]" : "";
+                    
                     if (inven[i].itemType == "무기")
                     {
-                        Console.WriteLine($"{i + 1}. [{inven[i].itemType}] {inven[i].itemName} (공격력 +{inven[i].itemAtk})");
+                        if (item.IsEquip == true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"{i + 1}. {equipStatus}[{inven[i].itemType}] {inven[i].itemName} (공격력 +{inven[i].itemAtk})");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{i + 1}. {equipStatus}[{inven[i].itemType}] {inven[i].itemName} (공격력 +{inven[i].itemAtk})");
+                        } 
                     }
                     else if (inven[i].itemType == "방어구")
                     {
@@ -411,8 +454,15 @@ class Program
                     }
                 case "1":
                     {
-                        item.Use();
-                        Console.WriteLine("\n아무 키나 눌러서 계속");
+                       if(!item.IsEquip)
+                        {
+                            item.Use();
+                        }
+                       else
+                        {
+                            item.UnEquip();
+                        }
+                            Console.WriteLine("\n아무 키나 눌러서 계속");
                         Console.ReadKey();
                         break;
                     }

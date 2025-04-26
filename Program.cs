@@ -274,6 +274,7 @@ public class Armor : Item //방어구
             isEquipped = false;
             Console.WriteLine($"{itemName} 을(를) 해제했습니다.");
         }
+    }
 
     public override bool IsEquip => isEquipped;
 }
@@ -410,7 +411,16 @@ class Program
                     }
                     else if (inven[i].itemType == "방어구")
                     {
-                        Console.WriteLine($"{i + 1}. [{inven[i].itemType}] {inven[i].itemName} (방어력 +{inven[i].itemDef})");
+                        if (item.IsEquip == true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"{i + 1}. {equipStatus}[{inven[i].itemType}] {inven[i].itemName} (방어력 +{inven[i].itemDef})");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{i + 1}. {equipStatus}[{inven[i].itemType}] {inven[i].itemName} (방어력 +{inven[i].itemDef})");
+                        }
                     }
                     else
                     {

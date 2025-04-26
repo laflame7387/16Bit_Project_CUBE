@@ -28,9 +28,10 @@ class Player
 
     public int TotalAtk => Atk + WeaponAtk;
     public int TotalDef => Def + ArmorDef;
-
+    
     public void DisplayStat()
     {
+        
         while (true)
         {
             Console.Clear();
@@ -42,7 +43,7 @@ class Player
             Console.WriteLine($"체력: {HP}");
             Console.WriteLine($"공격력: {Atk} ({WeaponAtk}) = {TotalAtk}");
             Console.WriteLine($"방어력: {Def} ({ArmorDef}) = {TotalDef}");
-            Console.WriteLine("무기: {Weapon}, 방어구: {Armor}");
+            Console.WriteLine($"무기: {Weapon} | 방어구: {Armor}");
             Console.WriteLine($"경험치: {Exp}/{ExpToLevel}");
 
             Console.WriteLine("\n\"0\"을 눌러 메뉴로 돌아가기");
@@ -214,25 +215,69 @@ public class Item//아이템 가상메서드 이용
     public virtual void Use()
     {
         Console.WriteLine($"{itemName}을 사용했습니다.");
-    }   
+    }
+    public virtual void UnEquip()
+    {
+        Console.WriteLine("장비를 해제했습니다.");
+    }
+
+    public virtual bool IsEquip => false; //장비 장착 확인
 }
 public class Weapon : Item //무기
 {
-    public Weapon(string itemName, int itemAtk) : base(itemName, itemAtk, 0, 0,"무기") { }
+    public bool isEquipped;
+
+    public Weapon(string itemName, int itemAtk) : base(itemName, itemAtk, 0, 0,"무기") 
+    {
+        isEquipped = false;
+    }
 
     public override void Use()
     {
-        Console.WriteLine($"{itemName} 무기를 장착했습니다. 공격력이 {itemAtk} 증가합니다.");
+        if (!isEquipped)
+        {
+            isEquipped = true;
+            Console.WriteLine($"{itemName} 을(를) 장착했습니다. 공격력이 {itemAtk} 증가합니다.");
+        }    
     }
+    public override void UnEquip()
+    {
+        if(isEquipped)
+        {
+            isEquipped = false;
+            Console.WriteLine($"{itemName} 을(를) 해제했습니다.");
+        }
+    }
+
+    public override bool IsEquip => isEquipped;
 }
 public class Armor : Item //방어구
 {
-    public Armor(string itemName, int itemDef) : base(itemName, 0, itemDef, 0, "방어구") { }
+    public bool isEquipped;
+
+    public Armor(string itemName, int itemDef) : base(itemName, 0, itemDef, 0, "방어구") 
+    {
+        isEquipped = false;
+    }
 
     public override void Use()
     {
-        Console.WriteLine($"{itemName} 방어구를 장착했습니다. 방어력이 {itemDef} 증가합니다.");
+        if (!isEquipped)
+        {
+            isEquipped = true;
+            Console.WriteLine($"{itemName} 방어구를 장착했습니다. 방어력이 {itemDef} 증가합니다.");
+        }
     }
+    public override void UnEquip()
+    {
+        if (isEquipped)
+        {
+            isEquipped = false;
+            Console.WriteLine($"{itemName} 을(를) 해제했습니다.");
+        }
+    }
+
+    public override bool IsEquip => isEquipped;
 }
 public class Supplies : Item //소모품 
 {
@@ -254,7 +299,7 @@ public class Supplies : Item //소모품
 }
 public class Others : Item //기타 아이템
 {
-    public Others(string itemName) : base(itemName, 0, 0, 1, "기타") { }
+    public Others(string itemName, int itemCount) : base(itemName, 0, 0, itemCount, "기타") { }
 
     public override void Use()
     {
@@ -285,6 +330,12 @@ class Program
 
         player = Player.CreatePlayer();
 
+        List<Item> inven = new List<Item>();// 샘플 아이템
+        inven.Add(new Weapon("낡은 검", 3));
+        inven.Add(new Armor("녹슨 갑옷", 3));
+        inven.Add(new Supplies("힐링 포션", 3));
+        inven.Add(new Others("큐브 조각", 1));
+
         while (true)
         {
             Console.Clear();
@@ -313,7 +364,7 @@ class Program
                     StartDungeon();
                     break;
                 case "3":
-                    Inventory();
+                    Inventory(inven);
                     break;
                 default:
                     Console.WriteLine("잘못된 입력입니다.");
@@ -321,29 +372,132 @@ class Program
             }
         }
     }
-    
-    
-    static void Inventory()//인벤토리
+
+    static void Inventory(List<Item> inven)//인벤토리
     {
         string input;
         do
         {
             Console.Clear();
             Console.WriteLine("[인벤토리]\n");
-            Console.WriteLine("1.");
-            Console.WriteLine("2.");
-            Console.WriteLine("3.");
-            Console.WriteLine("4.");
-            Console.WriteLine("\n0. 나가기");
+            Console.WriteLine("-[아이템 목록]-\n");
+            
+            if(inven.Count == 0)
+            {
+                Console.WriteLine("소지중인 아이템이 없습니다.");
+            }
+            
+            else if (inven.Count > 0)
+            {
+                for(int i = 0; i < inven.Count; i++)
+                {
+
+                    Item item = inven[i];
+
+
+                    string equipStatus = item.IsEquip ? "[E]" : "";
+                    
+                    if (inven[i].itemType == "무기")
+                    {
+                        if (item.IsEquip == true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"{i + 1}. {equipStatus}[{inven[i].itemType}] {inven[i].itemName} (공격력 +{inven[i].itemAtk})");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{i + 1}. {equipStatus}[{inven[i].itemType}] {inven[i].itemName} (공격력 +{inven[i].itemAtk})");
+                        } 
+                    }
+                    else if (inven[i].itemType == "방어구")
+                    {
+                        if (item.IsEquip == true)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"{i + 1}. {equipStatus}[{inven[i].itemType}] {inven[i].itemName} (방어력 +{inven[i].itemDef})");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{i + 1}. {equipStatus}[{inven[i].itemType}] {inven[i].itemName} (방어력 +{inven[i].itemDef})");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{i + 1}. [{inven[i].itemType}] {inven[i].itemName} (수량 : {inven[i].itemCount})");
+                    }
+                }
+            }
+            
+            Console.WriteLine("0. 나가기");
             Console.WriteLine("\n원하는 행동을 입력해주세요.");
             Console.Write(">>");
             input = Console.ReadLine();
-            break;
+
+            if (int.TryParse(input, out int index) && index > 0 && index <= inven.Count)
+            {
+                ItemMenu(inven[index - 1]);
+            }
+
         }
         while(input != "0");
         
     }   
     
+    static void ItemMenu(Item item)// 아이템 상세 메뉴
+    {
+        string input;
+        do
+        {
+            Console.Clear();
+            Console.WriteLine($"[{item.itemName}] 상세 메뉴");
+            Console.WriteLine("1. 아이템 사용");
+            Console.WriteLine("2. 아이템 정보 보기");
+            Console.WriteLine("0. 뒤로 가기");
+            Console.Write(">> ");
+            input = Console.ReadLine();
+            switch(input)
+            {
+                case "0":
+                    {
+                        break;
+                    }
+                case "1":
+                    {
+                       if(!item.IsEquip)
+                        {
+                            item.Use();
+                        }
+                       else
+                        {
+                            item.UnEquip();
+                        }
+                            Console.WriteLine("\n아무 키나 눌러서 계속");
+                        Console.ReadKey();
+                        break;
+                    }
+                case "2":
+                    {
+                        Console.WriteLine($"\n이름: {item.itemName}");
+                        Console.WriteLine($"타입: {item.itemType}");
+                        Console.WriteLine($"공격력: {item.itemAtk}, 방어력: {item.itemDef}");
+                        Console.WriteLine($"수량: {item.itemCount}");
+                        Console.WriteLine("\n아무 키나 눌러서 계속");
+                        Console.ReadKey();
+
+                        break;
+                    }
+                default:
+                    {
+                        Console.WriteLine("잘못된 입력입니다.");
+                        break;
+                    }
+            }
+            
+        }
+        while (input != "0");
+    }
 
     static void StartDungeon()
     {

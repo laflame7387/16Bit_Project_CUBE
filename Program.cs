@@ -215,26 +215,36 @@ public class Item//아이템 가상메서드 이용
     {
         Console.WriteLine($"{itemName}을 사용했습니다.");
     }
-    public virtual void CantUse()
-    {
-        Console.WriteLine("불가능한 행동 입니다.");
-    }
+    
+    
 }
 public class Weapon : Item //무기
 {
-    public Weapon(string itemName, int itemAtk) : base(itemName, itemAtk, 0, 0,"무기") { }
+    public bool isEquip;
+
+    public Weapon(string itemName, int itemAtk) : base(itemName, itemAtk, 0, 0,"무기") 
+    {
+        isEquip = false;
+    }
 
     public override void Use()
     {
+        isEquip = true;
         Console.WriteLine($"{itemName} 무기를 장착했습니다. 공격력이 {itemAtk} 증가합니다.");
     }
 }
 public class Armor : Item //방어구
 {
-    public Armor(string itemName, int itemDef) : base(itemName, 0, itemDef, 0, "방어구") { }
+    public bool isEquip;
+
+    public Armor(string itemName, int itemDef) : base(itemName, 0, itemDef, 0, "방어구") 
+    {
+        isEquip = false;
+    }
 
     public override void Use()
     {
+        isEquip = true;
         Console.WriteLine($"{itemName} 방어구를 장착했습니다. 방어력이 {itemDef} 증가합니다.");
     }
 }
@@ -350,11 +360,11 @@ class Program
                 {
                     if (inven[i].itemType == "무기")
                     {
-                        Console.WriteLine($"{i + 1}. [{inven[i].itemType}] {inven[i].itemName} (공격력 +{inven[i].itemAtk})(수량 : {inven[i].itemCount})");
+                        Console.WriteLine($"{i + 1}. [{inven[i].itemType}] {inven[i].itemName} (공격력 +{inven[i].itemAtk})");
                     }
                     else if (inven[i].itemType == "방어구")
                     {
-                        Console.WriteLine($"{i + 1}. [{inven[i].itemType}] {inven[i].itemName} (방어력 +{inven[i].itemDef})(수량 : {inven[i].itemCount})");
+                        Console.WriteLine($"{i + 1}. [{inven[i].itemType}] {inven[i].itemName} (방어력 +{inven[i].itemDef})");
                     }
                     else
                     {
@@ -398,10 +408,20 @@ class Program
                     }
                 case "1":
                     {
+                        item.Use();
+                        Console.WriteLine("\n아무 키나 눌러서 계속");
+                        Console.ReadKey();
                         break;
                     }
                 case "2":
                     {
+                        Console.WriteLine($"\n이름: {item.itemName}");
+                        Console.WriteLine($"타입: {item.itemType}");
+                        Console.WriteLine($"공격력: {item.itemAtk}, 방어력: {item.itemDef}");
+                        Console.WriteLine($"수량: {item.itemCount}");
+                        Console.WriteLine("\n아무 키나 눌러서 계속");
+                        Console.ReadKey();
+
                         break;
                     }
                 default:

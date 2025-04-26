@@ -28,9 +28,10 @@ class Player
 
     public int TotalAtk => Atk + WeaponAtk;
     public int TotalDef => Def + ArmorDef;
-
+    
     public void DisplayStat()
     {
+        
         while (true)
         {
             Console.Clear();
@@ -42,7 +43,7 @@ class Player
             Console.WriteLine($"체력: {HP}");
             Console.WriteLine($"공격력: {Atk} ({WeaponAtk}) = {TotalAtk}");
             Console.WriteLine($"방어력: {Def} ({ArmorDef}) = {TotalDef}");
-            Console.WriteLine("무기: {Weapon}, 방어구: {Armor}");
+            Console.WriteLine($"무기: {Weapon} | 방어구: {Armor}");
             Console.WriteLine($"경험치: {Exp}/{ExpToLevel}");
 
             Console.WriteLine("\n\"0\"을 눌러 메뉴로 돌아가기");

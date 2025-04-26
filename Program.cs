@@ -214,7 +214,11 @@ public class Item//아이템 가상메서드 이용
     public virtual void Use()
     {
         Console.WriteLine($"{itemName}을 사용했습니다.");
-    }   
+    }
+    public virtual void CantUse()
+    {
+        Console.WriteLine("불가능한 행동 입니다.");
+    }
 }
 public class Weapon : Item //무기
 {
@@ -254,7 +258,7 @@ public class Supplies : Item //소모품
 }
 public class Others : Item //기타 아이템
 {
-    public Others(string itemName) : base(itemName, 0, 0, 1, "기타") { }
+    public Others(string itemName, int itemCount) : base(itemName, 0, 0, itemCount, "기타") { }
 
     public override void Use()
     {
@@ -285,6 +289,12 @@ class Program
 
         player = Player.CreatePlayer();
 
+        List<Item> inven = new List<Item>();// 샘플 아이템
+        inven.Add(new Weapon("낡은 검", 3));
+        inven.Add(new Armor("녹슨 갑옷", 3));
+        inven.Add(new Supplies("힐링 포션", 3));
+        inven.Add(new Others("큐브 조각", 1));
+
         while (true)
         {
             Console.Clear();
@@ -313,7 +323,7 @@ class Program
                     StartDungeon();
                     break;
                 case "3":
-                    Inventory();
+                    Inventory(inven);
                     break;
                 default:
                     Console.WriteLine("잘못된 입력입니다.");
@@ -321,29 +331,89 @@ class Program
             }
         }
     }
-    
-    
-    static void Inventory()//인벤토리
+
+    static void Inventory(List<Item> inven)//인벤토리
     {
         string input;
         do
         {
             Console.Clear();
             Console.WriteLine("[인벤토리]\n");
-            Console.WriteLine("1.");
-            Console.WriteLine("2.");
-            Console.WriteLine("3.");
-            Console.WriteLine("4.");
-            Console.WriteLine("\n0. 나가기");
+            Console.WriteLine("-[아이템 목록]-\n");
+            if(inven.Count == 0)
+            {
+                Console.WriteLine("소지중인 아이템이 없습니다.");
+            }
+            else if (inven.Count > 0)
+            {
+                for(int i = 0; i < inven.Count; i++)
+                {
+                    if (inven[i].itemType == "무기")
+                    {
+                        Console.WriteLine($"{i + 1}. [{inven[i].itemType}] {inven[i].itemName} (공격력 +{inven[i].itemAtk})(수량 : {inven[i].itemCount})");
+                    }
+                    else if (inven[i].itemType == "방어구")
+                    {
+                        Console.WriteLine($"{i + 1}. [{inven[i].itemType}] {inven[i].itemName} (방어력 +{inven[i].itemDef})(수량 : {inven[i].itemCount})");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{i + 1}. [{inven[i].itemType}] {inven[i].itemName} (수량 : {inven[i].itemCount})");
+                    }
+                }
+            }
+            
+            Console.WriteLine("0. 나가기");
             Console.WriteLine("\n원하는 행동을 입력해주세요.");
             Console.Write(">>");
             input = Console.ReadLine();
-            break;
+
+            if (int.TryParse(input, out int index) && index > 0 && index <= inven.Count)
+            {
+                ItemMenu(inven[index - 1]);
+            }
+
         }
         while(input != "0");
         
     }   
     
+    static void ItemMenu(Item item)// 아이템 상세 메뉴
+    {
+        string input;
+        do
+        {
+            Console.Clear();
+            Console.WriteLine($"[{item.itemName}] 상세 메뉴");
+            Console.WriteLine("1. 아이템 사용");
+            Console.WriteLine("2. 아이템 정보 보기");
+            Console.WriteLine("0. 뒤로 가기");
+            Console.Write(">> ");
+            input = Console.ReadLine();
+            switch(input)
+            {
+                case "0":
+                    {
+                        break;
+                    }
+                case "1":
+                    {
+                        break;
+                    }
+                case "2":
+                    {
+                        break;
+                    }
+                default:
+                    {
+                        Console.WriteLine("잘못된 입력입니다.");
+                        break;
+                    }
+            }
+            
+        }
+        while (input != "0");
+    }
 
     static void StartDungeon()
     {

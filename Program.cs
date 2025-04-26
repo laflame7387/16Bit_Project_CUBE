@@ -215,38 +215,41 @@ public class Item//아이템 가상메서드 이용
     {
         Console.WriteLine($"{itemName}을 사용했습니다.");
     }
-    
-    
+
+    public virtual bool IsEquip => false; //장비 장착 확인
 }
 public class Weapon : Item //무기
 {
-    public bool isEquip;
+    public bool isEquipped;
 
     public Weapon(string itemName, int itemAtk) : base(itemName, itemAtk, 0, 0,"무기") 
     {
-        isEquip = false;
+        isEquipped = false;
     }
 
     public override void Use()
     {
-        isEquip = true;
+        isEquipped = true;
         Console.WriteLine($"{itemName} 무기를 장착했습니다. 공격력이 {itemAtk} 증가합니다.");
     }
+
+    public override bool IsEquip => isEquipped;
 }
 public class Armor : Item //방어구
 {
-    public bool isEquip;
+    public bool isEquipped;
 
     public Armor(string itemName, int itemDef) : base(itemName, 0, itemDef, 0, "방어구") 
     {
-        isEquip = false;
+        isEquipped = false;
     }
 
     public override void Use()
     {
-        isEquip = true;
+        isEquipped = true;
         Console.WriteLine($"{itemName} 방어구를 장착했습니다. 방어력이 {itemDef} 증가합니다.");
     }
+    public override bool IsEquip => isEquipped;
 }
 public class Supplies : Item //소모품 
 {
